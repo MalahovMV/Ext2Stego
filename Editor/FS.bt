@@ -1,0 +1,92 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+int empty[256];
+struct super_block
+{   // This part in all FS is equivalent
+    ulong inods_count;
+    ulong s_blocks_count;
+    ulong s_r_bloks_count;
+    ulong s_free_bloks_count;
+    ulong s_free_inodes_count;
+    ulong s_first_data_blog;
+    ulong s_log_block_size;
+    long s_log_frag_size;
+    ulong s_bloks_per_group;
+    ulong s_frags_per_group;
+    ulong s_inodes_per_group;
+    ulong s_mtime;
+    ulong s_wtime;
+    ushort x_mnt_count;
+    short predel_mnt;
+    ushort s_magic;
+    ushort s_state;
+    ushort s_errors;
+    ushort s_pad;
+    ulong s_lastcheck;
+    ulong s_chekinterval;
+    ulong s_creator_os;
+    ulong s_rev_level;
+    ulong s_reserved[10];
+} Super_Block;
+
+struct mount
+{
+    char name_device[16];
+    char mount_place[24];
+    int pass1[216];
+} Mount;
+
+struct goup_description
+{
+    ulong bg_block_bitmap;
+    ulong bg_inode_bitmap;
+    ulong bg_inode_table;
+    ushort bg_free_bloks_count;
+    ushort bg_free_inodes_count;
+    ushort bg_pad;
+    ulong bg_reserved[3];
+} Group_description; 
+
+int empty1[254*4];
+short empty2;
+unsigned char block_bitmap[256*4];
+int inode_bitmap[256];
+
+struct inode_desqr
+{
+    ushort l_mode;
+    ushort l_uid;
+    ulong l_size;
+    ulong l_atime;
+    ulong l_ctime;
+    ulong l_mtime;
+    ULONG L_dtime;
+    ushort l_gid;
+    ushort l_links_cout;
+    ulong l_blocks;
+    ulong l_flags;
+    ulong l_reserved1;
+    ulong l_block[15];
+    ulong l_version;
+    ulong l_file_acl;
+    ulong l_dir_acl;
+    ulong l_faddr;
+    uchar l_frag;
+    uchar l_fsize;
+    ushort l_pad1;
+    ulong l_reserved2[2];
+} Inode_Desqr1, Inode_Desqr2;
+
+unsigned char final[4*(256*968+191)];
+char tr;
