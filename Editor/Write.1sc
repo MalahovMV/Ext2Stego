@@ -8,6 +8,10 @@
 //  Category: 
 //   History: 
 //------------------------------------------------
+int file;
+file = FileOpen("/home/malahov/Documents/Stego/Files/file_with_audio.iso", true);
+RunTemplate("/home/malahov/Documents/Stego/Editor/FS.bt");
+
 void clear()
 {
     unsigned long i = 0;
@@ -77,7 +81,7 @@ void main()
         }
         j +=8;
     }
-    int file;
+    //int file;
     string file_name;
     char buffer[3];
     byte information[block_size];
@@ -85,13 +89,13 @@ void main()
     {
         SPrintf(buffer, "%d", i);      
         //Printf("%s\n", buffer);
-        file_name = ("/home/malahov/Documents/Stego/write" + buffer + ".txt");
+        file_name = ("/home/malahov/Documents/Stego/Files/write" + buffer + ".txt");
         Printf("%s", file_name);
         file = FileOpen(file_name, true);
         RunTemplate("/home/malahov/Documents/Stego/Editor/For_Copy.bt");
         information=inf;
         FileClose();
-        file = FileOpen("/home/malahov/Documents/Stego/file_with_audio.iso", true);
+        file = FileOpen("/home/malahov/Documents/Stego/Files/file_with_audio.iso", true);
         WriteBytes(information, empty_bloks[i]*block_size, block_size);
         Printf("%d", empty_bloks[i]);
     }
