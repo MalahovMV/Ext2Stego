@@ -47,6 +47,7 @@ def find_empty_blocks(block_size, bitmap):
 def main(fs, dir_from_read, number_read_files):
     block_size, bitmap = prepare_fs(fs)
     empty_blocks = find_empty_blocks(block_size, bitmap)
+    file_with_blocks = open('/home/malahov/Documents/Stego/Files/file_with_blocks', 'w')
     print(block_size)
     text = []
     for i in range(number_read_files):
@@ -63,7 +64,7 @@ def main(fs, dir_from_read, number_read_files):
         if (now_block in empty_blocks) and (number_write_now < len(text)):
             file_for_write.write(text[number_write_now])
             file_with_fs.seek(block_size * now_block)
-            print(now_block - 1)
+            file_with_blocks.write(str(now_block - 1) + ',')
             number_write_now += 1
 
         else:
