@@ -51,7 +51,7 @@ def main(fs, dir_from_read, number_read_files):
     print(block_size)
     text = []
     for i in range(number_read_files):
-        file_for_read = open(dir_from_read + str(i) + '.txt', 'rb')
+        file_for_read = open(dir_from_read + str(i), 'rb')
         text.append(file_for_read.read(block_size))
         file_for_read.close()
 

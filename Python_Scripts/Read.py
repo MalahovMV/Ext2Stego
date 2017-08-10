@@ -37,5 +37,5 @@ def main (file_where_read, fs):
     fs_file.close()
 
 if __name__ == '__main__':
-    main('/home/malahov/Documents/Stego/Files/Read.txt',
+    main('/home/malahov/Documents/Stego/Files/Read',
          '/home/malahov/Documents/Stego/Files/file_with_audio_change.iso')
