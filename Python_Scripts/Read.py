@@ -1,3 +1,5 @@
+
+
 def get_blocks(file_with_blocks):
     file = open(file_with_blocks, 'r')
     text = file.readline()[:-1]
@@ -6,6 +8,7 @@ def get_blocks(file_with_blocks):
 
 def prepare_fs(fs):
     file = open(fs, "rb")
+    file.seek(1024)
     smth = file.read(1)
     if smth[0] != 0:
         block_size = 1024
@@ -25,9 +28,10 @@ def prepare_fs(fs):
 
 def main (file_where_read, fs):
     block_massiv = get_blocks('/home/malahov/Documents/Stego/Files/file_with_blocks')
-    file = open(file_where_read, 'w')
+    file = open(file_where_read, 'wb')
     fs_file = open(fs, "rb")
     block_size = prepare_fs(fs)
+    i = 0
     for block in block_massiv:
         fs_file.seek(block_size * int(block))
         text = fs_file.read(block_size)
