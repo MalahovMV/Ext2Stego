@@ -1,10 +1,6 @@
+from Crypto.Cipher import AES
+from os import path
 
-
-def get_blocks(file_with_blocks):
-    file = open(file_with_blocks, 'r')
-    text = file.readline()[:-1]
-    block_list = text.split(',')
-    return block_list
 
 def prepare_fs(fs):
     file = open(fs, "rb")
@@ -25,17 +21,40 @@ def prepare_fs(fs):
     file.close()
     return block_size
 
+def test_marker(text, file_with_marker):
+    file_w_m = open(file_with_marker, 'rb')
+    marker = file_w_m.read()
+    file_w_m.close()
+    if text[:len(marker.decode())] == marker:
+        print(marker)
+        return True
+
+    else:
+        return False
+
+
+def decryption_text(text, file_with_key, key_size):
+    file_w_k = open(file_with_key, 'rb')
+    key = file_w_k.read(key_size)
+    file_w_k.close()
+    cypher = AES.new(key)
+    return cypher.decrypt(text)
 
 def main (file_where_read, fs):
-    block_massiv = get_blocks('/home/malahov/Documents/Stego/Files/file_with_blocks')
     file = open(file_where_read, 'wb')
     fs_file = open(fs, "rb")
     block_size = prepare_fs(fs)
-    i = 0
-    for block in block_massiv:
-        fs_file.seek(block_size * int(block))
+    size_fs = path.getsize('/home/malahov/Documents/Stego/Files/file_with_audio_change.iso')
+    byte_in_file = 0
+    while byte_in_file < size_fs:
+        fs_file.seek(byte_in_file)
         text = fs_file.read(block_size)
-        file.write(text)
+        key_size = 16
+        text = decryption_text(text, '/home/malahov/Documents/Stego/Files/Cipher_Key', key_size)
+        if test_marker(text, '/home/malahov/Documents/Stego/Files/Marker'):
+            file.write(text[20:])
+
+        byte_in_file += block_size
 
     file.close()
     fs_file.close()

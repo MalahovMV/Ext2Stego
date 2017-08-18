@@ -40,8 +40,27 @@ def find_empty_blocks(block_size, bitmap):
         else:
             blocks_now += 8
 
-    #random.shuffle(empty_blocks)
     return empty_blocks
+
+
+# def random_block(empty_blocks, from_blocks, to_blocks):
+#     i = 0
+#     j = 0
+#     for el in empty_blocks:
+#         if ((el > from_blocks) and (not i)):
+#             i = empty_blocks.index(el)
+#
+#         if ((el < to_blocks) and (not j)):
+#             j = empty_blocks.index(el)
+#             break
+#
+#     r_block = empty_blocks[i : j]
+#     random.shuffle(r_block)
+#     return(r_block)
+
+
+# def write_text(block_size, r_block, inf, file):
+#     pass
 
 
 def main(fs, dir_from_read, number_read_files):
