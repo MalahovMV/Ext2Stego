@@ -13,11 +13,8 @@ source Stego_Python/bin/activate
 pip install --upgrade pip
 pip install pycrypto
 # Запуск скрипта на запись файла в ФС
-python Python_Scripts/Write.py fs.iso $2 $3 $4
-# Замена старой файловой системы на скоректированную
-dd if=./fs_change.iso of=$1
+python Python_Scripts/Write.py fs.iso $1 $2 $3
 # Удаление временных файлов
 rm writ*
 rm -rf Stego_Python
 rm fs.iso
-rm fs_change.iso

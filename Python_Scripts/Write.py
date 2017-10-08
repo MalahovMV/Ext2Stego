@@ -1,9 +1,18 @@
-#Скрипт, реализующий запись файла в ФС
+#-*-coding: utf-8 -*-
+"""
+Stego
+Write
+Todo
 
+Create by MalahovMV on 02.10.2017 20:27
+"""
+import datetime
 from Universal_Function import create_marker, prepare_fs
 import os, sys, random
 from Crypto.Cipher import AES
-import time
+
+__author__ = 'MalahovMV'
+
 
 def separate(fs, path_fail, file_with_key, file_with_marker):
     """
@@ -14,31 +23,42 @@ def separate(fs, path_fail, file_with_key, file_with_marker):
     :param file_with_marker: Файл с маркером
     :return: Возвращает количество блоков, на которые был разбит файл
     """
-    key_size = 16 # Задается длина ключа
-    marker_size = 16 # Задается длина маркера
-    file = open(file_with_key, 'rb')
-    key = file.read(key_size)
-    file.close()
-    file = open(path_fail, 'rb')
-    block_size, bitmap = prepare_fs(fs) # Вызов функции, определяющей размер блока в ФС и возвращающей битовую карту
-    size = os.path.getsize(path_fail) # Определение размера стегонаграфируемого файла
-    acc = 0 # Переменная, определяет сколько байтов из исходного файла уже обработано
-    number_block = 0 # Переменная, определяет номер следующего обрабатываемого блока
-    marker_lot = create_marker(file_with_marker, key, marker_size, (size//block_size + 1)) # Получение из функции всех необходимых маркеров для каждого блока
-    while acc < size:
-        inf = file.read(block_size - marker_size)
-        while len(inf) < (block_size - marker_size): #Последний блок дозаполняем нулевыми байтами до конца
-            inf += b'0'
+    #Длина ключа
+    key_size = 16
+    #Длина маркера
+    marker_size = 16
+    with open(file_with_key, 'rb') as file:
+        key = file.read(key_size)
 
-        cipher = AES.new(key)
-        inf = marker_lot[number_block * marker_size : (number_block + 1) * marker_size]+ cipher.encrypt(inf)
-        file_w = open('write' + str(number_block), 'wb')
-        file_w.write(inf)
-        file_w.close()
-        acc += block_size - marker_size
-        number_block += 1
+    #Определяется размер блока в ФС и битовая карта
+    block_size, bitmap = prepare_fs(fs)
+    #Размер стегонаграфируемого файла
+    size = os.path.getsize(path_fail)
 
-    file.close()
+    #Счетчик обработанных байтов из исходного файла
+    acc = 0
+    #Номер следующего обрабатываемого блока
+    number_block = 0
+    #Получение маркеров для всех блоков
+    marker_lot = create_marker(file_with_marker, key, marker_size, (
+    size // block_size + 1))
+    with open(path_fail, 'rb') as file:
+        while acc < size:
+            inf = file.read(block_size - marker_size)
+            # Последний блок заполняется нулями до конца
+            while len(inf) < (block_size - marker_size):
+                inf += b'0'
+
+            #Шифрование информации
+            cipher = AES.new(key)
+            inf = marker_lot[number_block * marker_size: (number_block + 1) * marker_size] + cipher.encrypt(inf)
+            with open('write' + str(number_block), 'wb') as file_w:
+                file_w.write(inf)
+
+            #Подсчет числа обработанных байтов
+            acc += block_size - marker_size
+            number_block += 1
+
     return number_block
 
 
@@ -51,7 +71,7 @@ def find_empty_blocks(bitmap, last_block):
     exp_binary = [128, 64, 32, 16, 8, 4, 2, 1]
     empty_blocks = []
     blocks_now = 1
-    #Каждый считанный байт переводится в 8 бит
+    # Каждый считанный байт переводится в 8 бит
     for el in bitmap:
         if el != 255:
             for i in range(len(exp_binary)):
@@ -75,44 +95,54 @@ def find_empty_blocks(bitmap, last_block):
 
 def main(fs, enter_file, file_with_key, file_with_marker):
     """
-    
+
     :param fs: Файловая система
     :param enter_file: Файл, который должен быть застеганографирован
     :param file_with_key: Файл с ключом шифрования
     :param file_with_marker: Файл с маркером
     :return: 
     """
-    number_read_files = separate(fs, enter_file, file_with_key, file_with_marker) #Разбивка файла на блоки с доьавлением маркера и шифрованием
-    block_size, bitmap = prepare_fs(fs) #Определение свойств файловой системы
-    empty_blocks = find_empty_blocks(bitmap, (os.path.getsize(fs) // block_size))[:number_read_files] #Возвращает номера пустых блоков в количестве, необходимом для записи файла
-    sorted(empty_blocks) #Сортируем пустые блоки, так как ищз-за особенностей алгоритма, сначала информация должна быть записана в более ранние блоки
-    text = [] #Все блоки,на которые был разбит исходный файл, переносятся в список
+    #Разбиение файла на блоки с добавлением маркера и шифрованием
+    number_read_files = separate(fs, enter_file, file_with_key,
+                                 file_with_marker)
+    # Определение свойств файловой системы
+    block_size, bitmap = prepare_fs(fs)
+    # Возвращает номера пустых блоков в количестве, необходимом для записи файла
+    empty_blocks = find_empty_blocks(bitmap, (os.path.getsize(fs) // block_size))[
+                   :number_read_files]
+    # Сортировка первых случайных N (необходимых для записи) пустых блоков
+    sorted(empty_blocks)
+    # Все блоки,на которые был разбит исходный файл, переносятся в список
+    text = []
     for i in range(number_read_files):
-        file_for_read = open('write' + str(i), 'rb')
-        text.append(file_for_read.read(block_size))
-        file_for_read.close()
+        with open('write' + str(i), 'rb') as file_for_read:
+            text.append(file_for_read.read(block_size))
 
-    random.shuffle(text) #Происходит перемещивание порядка блоков исходного файла
-    file_with_fs = open(fs, 'rb')
-    file_for_write = open(fs[:-4] + '_change.iso', 'wb') #Новая ФС
-    number_write_now = 0
-    now_block = 1 #Номер обрабатываемого блока в ФС
-    while (now_block * block_size) < os.path.getsize(fs):
-        if (now_block in empty_blocks) :
-            file_for_write.write(text[number_write_now])
-            file_with_fs.seek(block_size * now_block)
-            number_write_now += 1
+    # Перемещивание порядка блоков исходного файла
+    random.shuffle(text)
 
-        else:
-            file_for_write.write(file_with_fs.read(1024))
+    with open(fs, 'rb') as file_old_fs:
+        # Новая ФС
+        with open(fs[:-4] + '_change.iso', 'wb') as file_new_fs:
+            number_write_now = 0
+            # Номер обрабатываемого блока в ФС
+            now_block = 1
+            #Запись в файловую систему
+            while (now_block * block_size) < os.path.getsize(fs):
+                if (now_block in empty_blocks):
+                    file_new_fs.write(text[number_write_now])
+                    file_old_fs.seek(block_size * now_block)
+                    number_write_now += 1
 
-        now_block += 1
+                else:
+                    file_new_fs.write(file_old_fs.read(1024))
 
-    file_for_write.close()
-    file_with_fs.close()
+                now_block += 1
+
 
 
 if __name__ == '__main__':
+    print(u'Run Write.py {0}'.format(datetime.datetime.now()))
     try:
         arg1 = sys.argv[1]
         arg2 = sys.argv[2]
