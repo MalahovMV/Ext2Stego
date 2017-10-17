@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://github.com/MalahovMV/Stego
 
 # Копирует флешку побайтово в файл fs.iso.
 # Входной параметр - имя "Device"
